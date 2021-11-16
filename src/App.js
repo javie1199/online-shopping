@@ -5,7 +5,10 @@ import "./App.css";
 import ShopPage from "./pages/shoppage/shoppage.component";
 import Header from "./components/header/header.component";
 import SignInAndSignUp from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
-import { auth } from "./firebase/firebase.utils";
+import {
+  auth,
+  createUserProfileDocumentation,
+} from "./firebase/firebase.utils";
 
 class App extends React.Component {
   constructor() {
@@ -24,8 +27,8 @@ class App extends React.Component {
 
   // set current user if new user login
   componentDidMount() {
-    auth.onAuthStateChanged((user) => {
-      console.log(user);
+    auth.onAuthStateChanged(async (user) => {
+      createUserProfileDocumentation(user);
       this.setState({ currentUser: user });
     });
   }

@@ -17,32 +17,42 @@ const config = {
 // Initialize Firebase
 firebase.initializeApp(config);
 
-export const fireStore = firebase.firestore();
-
 // Sign in with google account
 // https://firebase.google.com/docs/auth/web/google-signin
 const provider = new GoogleAuthProvider();
 export const auth = getAuth();
+export const fireStore = firebase.firestore();
 // const auth = getAuth();
-export const signInWithGoogle = () =>
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      // The signed-in user info.
-      const user = result.user;
-      // ...
-    })
-    .catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
-    });
+export const signInWithGoogle = () => signInWithPopup(auth, provider);
+
+// Add new user to database (Collections) -> Create a function to do that
+export const createUserProfileDocumentation = async (
+  userAuth,
+  additionalData
+) => {
+  // Get user from Google Authentication -> Check if that use exist in db -> if not then add user, otherwise ignore it.
+  if (!userAuth) return;
+
+  const userRef = fireStore.doc(`users/${userAuth.uid}`);
+
+  const snapShot = await userRef.get();
+
+  if (!snapShot.exists) {
+    // create variable to add to collections
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+
+    try {
+      userRef.set({
+        displayName,
+        email,
+        createdAt,
+        ...additionalData,
+      });
+    } catch (error) {
+      console.log("error create user", error.message);
+    }
+  }
+};
 
 export default firebase;
