@@ -4,7 +4,8 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-// Your web app's Firebase configuration
+
+// The web app's Firebase configuration
 const config = {
   apiKey: "AIzaSyDkjrkGOeRgfy_I0GyvYdizZaGH1KClxBw",
   authDomain: "online-shopping-db-f67c6.firebaseapp.com",
@@ -21,24 +22,28 @@ firebase.initializeApp(config);
 // https://firebase.google.com/docs/auth/web/google-signin
 const provider = new GoogleAuthProvider();
 export const auth = getAuth();
-export const fireStore = firebase.firestore();
-// const auth = getAuth();
 export const signInWithGoogle = () => signInWithPopup(auth, provider);
 
-// Add new user to database (Collections) -> Create a function to do that
+// Reference collection data in firebaseStore
+export const fireStore = firebase.firestore();
+
+// Create new doc for Users Collection
 export const createUserProfileDocumentation = async (
   userAuth,
   additionalData
 ) => {
-  // Get user from Google Authentication -> Check if that use exist in db -> if not then add user, otherwise ignore it.
+  // Check if Google user signed in, if not ignore it
   if (!userAuth) return;
 
+  // If user signed in by Google account, grap that user
   const userRef = fireStore.doc(`users/${userAuth.uid}`);
 
+  // take snapShot of that user
   const snapShot = await userRef.get();
 
+  // Check if user exists in db, if not, add that user in db
   if (!snapShot.exists) {
-    // create variable to add to collections
+    // take info from that user
     const { displayName, email } = userAuth;
     const createdAt = new Date();
 
@@ -52,6 +57,9 @@ export const createUserProfileDocumentation = async (
     } catch (error) {
       console.log("error create user", error.message);
     }
+
+    // return that user
+    return userRef;
   }
 };
 
