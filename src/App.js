@@ -20,16 +20,32 @@ class App extends React.Component {
   }
 
   unsubscribeFromAuth = null;
-  // delete user when close window
+
+  //  sign out user when close window
   componentWillUnmount() {
     this.unsubscribeFromAuth();
   }
 
-  // set current user if new user login
+  // after rendering the app, listen for user login
+  // if user login with Google account, check that user exist in db, otherwise create new user then set state current user as that user to render component in order to show up log out navi
   componentDidMount() {
-    auth.onAuthStateChanged(async (user) => {
-      createUserProfileDocumentation(user);
-      this.setState({ currentUser: user });
+    // Adds an observer for changes to the user's sign-in state.
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      if (userAuth) {
+        const userRef = await createUserProfileDocumentation(userAuth);
+
+        userRef.onSnapshot((snapShot) => {
+          this.setState({
+            currentUser: {
+              id: snapShot.id,
+              ...snapShot.data(),
+            },
+          });
+        });
+      }
+
+      // if userAuth does not exist, return null
+      this.setState({ currentUser: userAuth });
     });
   }
 
