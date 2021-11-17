@@ -3,7 +3,7 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 // The web app's Firebase configuration
 const config = {
@@ -21,7 +21,7 @@ firebase.initializeApp(config);
 // Sign in with google account
 // https://firebase.google.com/docs/auth/web/google-signin
 const provider = new GoogleAuthProvider();
-export const auth = getAuth();
+export const auth = firebase.auth();
 export const signInWithGoogle = () => signInWithPopup(auth, provider);
 
 // Reference collection data in firebaseStore
@@ -57,10 +57,9 @@ export const createUserProfileDocumentation = async (
     } catch (error) {
       console.log("error create user", error.message);
     }
-
-    // return that user
-    return userRef;
   }
+  // return that user
+  return userRef;
 };
 
 export default firebase;
