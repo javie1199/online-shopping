@@ -21,7 +21,7 @@ class App extends React.Component {
 
   unsubscribeFromAuth = null;
 
-  //  sign out user when close window
+  //  sign out user when close the tab
   componentWillUnmount() {
     this.unsubscribeFromAuth();
   }
